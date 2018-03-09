@@ -2,9 +2,10 @@ package lunchlambda
 
 import (
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/larwef/lunchlambda/lunchgetters"
+	"github.com/larwef/lunchlambda/lunchsources"
 	"log"
 	"os"
+	"time"
 )
 
 const (
@@ -17,7 +18,7 @@ func Handler() error {
 
 	lunchUrl := os.Getenv(LunchUrl)
 
-	menus, err := lunchgetters.NewBraathenLunchGetter().GetLunches(lunchUrl)
+	menus, err := lunchsources.NewBraathen(lunchUrl, time.Now()).GetMenus()
 	if err != nil {
 		log.Printf("received error from lunchgetter:%s", err)
 		return err

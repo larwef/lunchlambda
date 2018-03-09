@@ -15,6 +15,6 @@ func TestLunch_ToString(t *testing.T) {
 		LunchItems: lunchItems,
 	}
 
-	expected := "Lunch Menu 07.03.2018\n- Some vegetarian alternative\n- Some main dish\n- Some soup"
+	expected := "Lunch Menu 07.03.2018\n- Some vegetarian alternative\n- Some main dish\n- Some soup\nNB: Menu may vary from what's presented"
 	testutil.AssertEqual(t, lunches.ToString(), expected)
 }

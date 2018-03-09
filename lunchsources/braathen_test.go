@@ -1,4 +1,4 @@
-package lunchgetters
+package lunchsources
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func TestBraathenLunchGetter_GetLunches(t *testing.T) {
+func TestBraathen_GetMenu(t *testing.T) {
 	mux, url, teardown := testutil.Setup()
 
 	defer teardown()
@@ -20,39 +20,60 @@ func TestBraathenLunchGetter_GetLunches(t *testing.T) {
 		fmt.Fprint(w, testutil.GetTestFileAsString(t, "../testdata/pageSource.html"))
 	})
 
-	menus, err := NewBraathenLunchGetter().GetLunches(url)
+	loc, err := time.LoadLocation("Europe/Oslo")
+	testutil.AssertNotError(t, err)
+	menu, err := NewBraathen(url, time.Date(2018, time.March, 8, 0, 0, 0, 0, loc)).GetMenu()
+	testutil.AssertNotError(t, err)
+
+	expected := lunch.Menu{
+		Timestamp:  time.Date(2018, time.March, 8, 0, 0, 0, 0, loc),
+		LunchItems: []string{"Fiskegrateng med pepperrotsmør", "Asiatisk marinert sopp", "Potetgrateng med spicy salat", "Gulrotsuppe med ingefær"},
+	}
+
+	testutil.AssertEqual(t, reflect.DeepEqual(menu, expected), true)
+}
+
+func TestBraathen_GetLunches(t *testing.T) {
+	mux, url, teardown := testutil.Setup()
+
+	defer teardown()
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, testutil.GetTestFileAsString(t, "../testdata/pageSource.html"))
+	})
+
+	menus, err := NewBraathen(url, time.Time{}).GetMenus()
 	testutil.AssertNotError(t, err)
 	testutil.AssertEqual(t, len(menus), 5)
 
 	loc, err := time.LoadLocation("Europe/Oslo")
 	testutil.AssertNotError(t, err)
-	menu1 := lunch.Menu{
+
+	expected := make(map[string]lunch.Menu)
+	expected["20180305"] = lunch.Menu{
 		Timestamp:  time.Date(2018, time.March, 5, 0, 0, 0, 0, loc),
 		LunchItems: []string{"Fersk pasta med mornaysaus", "Potetsalat", "Fersk pasta med vegetar mornaysaus", "Grønnsakssuppe"},
 	}
-	menu2 := lunch.Menu{
+	expected["20180306"] = lunch.Menu{
 		Timestamp:  time.Date(2018, time.March, 6, 0, 0, 0, 0, loc),
 		LunchItems: []string{"Fiskekaker med mandelpotet og skalldyrsaus", "Råkostsalat med urtevinaigrette", "Bakt brokkoli med bulgur", "Kyllingsuppe"},
 	}
-	menu3 := lunch.Menu{
+	expected["20180307"] = lunch.Menu{
 		Timestamp:  time.Date(2018, time.March, 7, 0, 0, 0, 0, loc),
 		LunchItems: []string{"Lasagne al forno", "Tomat- og rødløksalat med balsamico", "Falafel med stekte grønnsaker og tahinidressing", "Kremet fiskesuppe"},
 	}
-	menu4 := lunch.Menu{
+	expected["20180308"] = lunch.Menu{
 		Timestamp:  time.Date(2018, time.March, 8, 0, 0, 0, 0, loc),
 		LunchItems: []string{"Fiskegrateng med pepperrotsmør", "Asiatisk marinert sopp", "Potetgrateng med spicy salat", "Gulrotsuppe med ingefær"},
 	}
-	menu5 := lunch.Menu{
+	expected["20180309"] = lunch.Menu{
 		Timestamp:  time.Date(2018, time.March, 9, 0, 0, 0, 0, loc),
 		LunchItems: []string{"Røkt svinenakke med rødvinssaus og baconfrest sopp", "Nicoisesalat", "Vegetar Jambalaya", "Fisk Bisque"},
 	}
 
-	expected := []lunch.Menu{menu1, menu2, menu3, menu4, menu5}
-
-	for i, element := range menus {
-		testutil.AssertEqual(t, reflect.DeepEqual(element, expected[i]), true)
+	for key, value := range menus {
+		testutil.AssertEqual(t, reflect.DeepEqual(value, expected[key]), true)
 	}
-
 }
 
 func Test_getTimestampFromString(t *testing.T) {

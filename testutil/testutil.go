@@ -15,8 +15,8 @@ func Setup() (mux *http.ServeMux, url string, teardown func()) {
 	handler.Handle("/", mux)
 	server := httptest.NewServer(handler)
 
-	os.Setenv("HOOK_URL", server.URL)
-	os.Setenv("LUNCH_URL", server.URL)
+	os.Setenv("HOOK_URL", server.URL+"/hook")
+	os.Setenv("LUNCH_URL", server.URL+"/lunch")
 
 	return mux, server.URL, server.Close
 }

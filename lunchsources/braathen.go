@@ -1,4 +1,4 @@
-package lunchgetters
+package lunchsources
 
 import (
 	"fmt"
@@ -13,18 +13,39 @@ import (
 )
 
 const (
-	containerClass = "article-related-images slideshow"
+	ContainerClass = "article-related-images slideshow"
 )
 
-type BraathenLunchGetter struct{}
-
-func NewBraathenLunchGetter() *BraathenLunchGetter {
-	return &BraathenLunchGetter{}
+type Braathen struct {
+	sourceUrl string
+	timestamp time.Time
 }
 
-func (b *BraathenLunchGetter) GetLunches(url string) ([]lunch.Menu, error) {
-	log.Printf("Getting lunch menu from %s", url)
-	resp, err := http.Get(url)
+func NewBraathen(url string, timestamp time.Time) *Braathen {
+	return &Braathen{sourceUrl: url, timestamp: timestamp}
+}
+
+func (b *Braathen) GetMenu() (lunch.Menu, error) {
+	menus, err := b.GetMenus()
+	if err != nil {
+		return lunch.Menu{}, err
+	}
+
+	menu, isPresent := menus[getKeyFromTime(b.timestamp)]
+	if !isPresent {
+		return lunch.Menu{}, fmt.Errorf("couldn't find lunch for date: %s", b.timestamp)
+	}
+
+	return menu, nil
+}
+
+func getKeyFromTime(time time.Time) string {
+	return fmt.Sprintf("%02d%02d%02d", time.Year(), time.Month(), time.Day())
+}
+
+func (b *Braathen) GetMenus() (map[string]lunch.Menu, error) {
+	log.Printf("Getting lunch menu from %s", b.sourceUrl)
+	resp, err := http.Get(b.sourceUrl)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -32,27 +53,28 @@ func (b *BraathenLunchGetter) GetLunches(url string) ([]lunch.Menu, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		return []lunch.Menu{}, fmt.Errorf("received response: \"%s\" on GET", resp.Status)
+		return nil, fmt.Errorf("received response: \"%s\" on GET", resp.Status)
 	}
 
 	doc, err := html.Parse(resp.Body)
 	if err != nil {
-		log.Fatal("Error parsing")
+		return nil, fmt.Errorf("error parsing http repsonse: %v", err)
 	}
 
-	node := getNodeByClass(containerClass, doc)
+	node := getNodeByClass(ContainerClass, doc)
 	if node == nil {
-		log.Fatalf("didn't find container node")
+		return nil, fmt.Errorf("couldn't find container node with class: %s", ContainerClass)
 	}
+
 	text := getContentTextFromNode(node)
 	splitSlice := splitSlice(text, "DAGENS MENY")
 
-	var menus []lunch.Menu
+	menus := make(map[string]lunch.Menu)
 	for _, slice := range splitSlice {
 		menu := lunch.Menu{}
 		menu.Timestamp, err = getTimestampFromString(slice[0])
 		if err != nil {
-			return []lunch.Menu{}, err
+			return nil, err
 		}
 		for _, line := range slice[1:] {
 			for _, s := range strings.Split(line, "|") {
@@ -62,7 +84,10 @@ func (b *BraathenLunchGetter) GetLunches(url string) ([]lunch.Menu, error) {
 				}
 			}
 		}
-		menus = append(menus, menu)
+		if val, isPresent := menus[getKeyFromTime(menu.Timestamp)]; isPresent {
+			log.Printf("Found duplicate key: %s, existing value: %s replaced with new value %s", getKeyFromTime(menu.Timestamp), val, menu)
+		}
+		menus[getKeyFromTime(menu.Timestamp)] = menu
 	}
 	return menus, nil
 }
@@ -93,6 +118,7 @@ func isClass(class string, node *html.Node) bool {
 	return false
 }
 
+// Gets all text content from within the node. The text content of each subnode is appended to the result.
 func getContentTextFromNode(node *html.Node) []string {
 	var textLines []string
 	var f func(*html.Node)

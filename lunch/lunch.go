@@ -3,17 +3,20 @@ package lunch
 import (
 	"bytes"
 	"fmt"
-	"strings"
 	"time"
 )
 
 type Menu struct {
-	Timestamp  time.Time `json:"timestamp"`
-	LunchItems []string  `json:"lunch_items"`
+	Timestamp  time.Time
+	LunchItems []string
 }
 
 type Getter interface {
-	GetLunches(url string) ([]Menu, error)
+	GetMenu() (Menu, error)
+}
+
+type Poster interface {
+	SendMenu(menus Menu) error
 }
 
 func (l *Menu) ToString() string {
@@ -23,6 +26,7 @@ func (l *Menu) ToString() string {
 	for _, item := range l.LunchItems {
 		buffer.WriteString("- " + item + "\n")
 	}
+	buffer.WriteString("NB: Menu may vary from what's presented")
 
-	return strings.TrimSuffix(buffer.String(), "\n")
+	return buffer.String()
 }
