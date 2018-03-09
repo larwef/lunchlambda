@@ -3,7 +3,8 @@ TARGET=target/lunchlambda
 all: test build
 
 test:
-	go test ./...
+	go fmt ./...
+	go test ./... -v
 
 build:
 	GOOS=linux go build -o $(TARGET)
