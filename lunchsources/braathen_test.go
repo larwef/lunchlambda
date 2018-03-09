@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/larwef/lunchlambda/lunch"
 	"github.com/larwef/lunchlambda/testutil"
-	"github.com/magiconair/properties/assert"
 	"net/http"
 	"reflect"
 	"testing"
@@ -124,6 +123,6 @@ func Test_splitSlice(t *testing.T) {
 
 	for i, element := range testSlices {
 		splitSlice := splitSlice(element, "Split")
-		assert.Equal(t, len(splitSlice), expectedLengths[i])
+		testutil.AssertEqual(t, len(splitSlice), expectedLengths[i])
 	}
 }
