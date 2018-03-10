@@ -1,8 +1,8 @@
-package lunchsources
+package menusources
 
 import (
 	"fmt"
-	"github.com/larwef/lunchlambda/lunch"
+	"github.com/larwef/lunchlambda/menu"
 	"github.com/larwef/lunchlambda/testutil"
 	"net/http"
 	"reflect"
@@ -21,18 +21,18 @@ func TestBraathen_GetMenu(t *testing.T) {
 
 	loc, err := time.LoadLocation("Europe/Oslo")
 	testutil.AssertNotError(t, err)
-	menu, err := NewBraathen(url, time.Date(2018, time.March, 8, 0, 0, 0, 0, loc)).GetMenu()
+	m, err := NewBraathen(url, time.Date(2018, time.March, 8, 0, 0, 0, 0, loc)).GetMenu()
 	testutil.AssertNotError(t, err)
 
-	expected := lunch.Menu{
-		Timestamp:  time.Date(2018, time.March, 8, 0, 0, 0, 0, loc),
-		LunchItems: []string{"Fiskegrateng med pepperrotsmør", "Asiatisk marinert sopp", "Potetgrateng med spicy salat", "Gulrotsuppe med ingefær"},
+	expected := menu.Menu{
+		Timestamp: time.Date(2018, time.March, 8, 0, 0, 0, 0, loc),
+		MenuItems: []string{"Fiskegrateng med pepperrotsmør", "Asiatisk marinert sopp", "Potetgrateng med spicy salat", "Gulrotsuppe med ingefær"},
 	}
 
-	testutil.AssertEqual(t, reflect.DeepEqual(menu, expected), true)
+	testutil.AssertEqual(t, reflect.DeepEqual(m, expected), true)
 }
 
-func TestBraathen_GetLunches(t *testing.T) {
+func TestBraathen_GetMenus(t *testing.T) {
 	mux, url, teardown := testutil.Setup()
 
 	defer teardown()
@@ -48,26 +48,26 @@ func TestBraathen_GetLunches(t *testing.T) {
 	loc, err := time.LoadLocation("Europe/Oslo")
 	testutil.AssertNotError(t, err)
 
-	expected := make(map[string]lunch.Menu)
-	expected["20180305"] = lunch.Menu{
-		Timestamp:  time.Date(2018, time.March, 5, 0, 0, 0, 0, loc),
-		LunchItems: []string{"Fersk pasta med mornaysaus", "Potetsalat", "Fersk pasta med vegetar mornaysaus", "Grønnsakssuppe"},
+	expected := make(map[string]menu.Menu)
+	expected["20180305"] = menu.Menu{
+		Timestamp: time.Date(2018, time.March, 5, 0, 0, 0, 0, loc),
+		MenuItems: []string{"Fersk pasta med mornaysaus", "Potetsalat", "Fersk pasta med vegetar mornaysaus", "Grønnsakssuppe"},
 	}
-	expected["20180306"] = lunch.Menu{
-		Timestamp:  time.Date(2018, time.March, 6, 0, 0, 0, 0, loc),
-		LunchItems: []string{"Fiskekaker med mandelpotet og skalldyrsaus", "Råkostsalat med urtevinaigrette", "Bakt brokkoli med bulgur", "Kyllingsuppe"},
+	expected["20180306"] = menu.Menu{
+		Timestamp: time.Date(2018, time.March, 6, 0, 0, 0, 0, loc),
+		MenuItems: []string{"Fiskekaker med mandelpotet og skalldyrsaus", "Råkostsalat med urtevinaigrette", "Bakt brokkoli med bulgur", "Kyllingsuppe"},
 	}
-	expected["20180307"] = lunch.Menu{
-		Timestamp:  time.Date(2018, time.March, 7, 0, 0, 0, 0, loc),
-		LunchItems: []string{"Lasagne al forno", "Tomat- og rødløksalat med balsamico", "Falafel med stekte grønnsaker og tahinidressing", "Kremet fiskesuppe"},
+	expected["20180307"] = menu.Menu{
+		Timestamp: time.Date(2018, time.March, 7, 0, 0, 0, 0, loc),
+		MenuItems: []string{"Lasagne al forno", "Tomat- og rødløksalat med balsamico", "Falafel med stekte grønnsaker og tahinidressing", "Kremet fiskesuppe"},
 	}
-	expected["20180308"] = lunch.Menu{
-		Timestamp:  time.Date(2018, time.March, 8, 0, 0, 0, 0, loc),
-		LunchItems: []string{"Fiskegrateng med pepperrotsmør", "Asiatisk marinert sopp", "Potetgrateng med spicy salat", "Gulrotsuppe med ingefær"},
+	expected["20180308"] = menu.Menu{
+		Timestamp: time.Date(2018, time.March, 8, 0, 0, 0, 0, loc),
+		MenuItems: []string{"Fiskegrateng med pepperrotsmør", "Asiatisk marinert sopp", "Potetgrateng med spicy salat", "Gulrotsuppe med ingefær"},
 	}
-	expected["20180309"] = lunch.Menu{
-		Timestamp:  time.Date(2018, time.March, 9, 0, 0, 0, 0, loc),
-		LunchItems: []string{"Røkt svinenakke med rødvinssaus og baconfrest sopp", "Nicoisesalat", "Vegetar Jambalaya", "Fisk Bisque"},
+	expected["20180309"] = menu.Menu{
+		Timestamp: time.Date(2018, time.March, 9, 0, 0, 0, 0, loc),
+		MenuItems: []string{"Røkt svinenakke med rødvinssaus og baconfrest sopp", "Nicoisesalat", "Vegetar Jambalaya", "Fisk Bisque"},
 	}
 
 	for key, value := range menus {

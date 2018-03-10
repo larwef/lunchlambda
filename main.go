@@ -2,30 +2,34 @@ package lunchlambda
 
 import (
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/larwef/lunchlambda/lunchsources"
+	"github.com/larwef/lunchlambda/menusinks"
+	"github.com/larwef/lunchlambda/menusources"
 	"log"
 	"os"
 	"time"
 )
 
 const (
-	LunchUrl = "LUNCH_URL"
-	HookUrl  = "HOOK_URL"
+	MenuUrl = "MENU_URL"
+	HookUrl = "HOOK_URL"
 )
 
 func Handler() error {
 	log.Println("lunchLambda invoked")
 
-	lunchUrl := os.Getenv(LunchUrl)
+	menuUrl := os.Getenv(MenuUrl)
 
-	menus, err := lunchsources.NewBraathen(lunchUrl, time.Now()).GetMenus()
+	menu, err := menusources.NewBraathen(menuUrl, time.Now()).GetMenu()
 	if err != nil {
-		log.Printf("received error from lunchgetter:%s", err)
+		log.Printf("received error from menusource: %s", err)
 		return err
 	}
 
-	for _, menu := range menus {
-		log.Println("\n" + menu.ToString())
+	if !menu.IsEmpty() {
+		if err := menusinks.NewSlack(HookUrl).SendMenu(menu); err != nil {
+			log.Printf("received error from menusink: %s", err)
+			return err
+		}
 	}
 
 	log.Println("lunchLambda finished")

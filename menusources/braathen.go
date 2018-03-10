@@ -1,8 +1,8 @@
-package lunchsources
+package menusources
 
 import (
 	"fmt"
-	"github.com/larwef/lunchlambda/lunch"
+	"github.com/larwef/lunchlambda/menu"
 	"golang.org/x/net/html"
 	"log"
 	"net/http"
@@ -25,29 +25,30 @@ func NewBraathen(url string, timestamp time.Time) *Braathen {
 	return &Braathen{sourceUrl: url, timestamp: timestamp}
 }
 
-func (b *Braathen) GetMenu() (lunch.Menu, error) {
+func (b *Braathen) GetMenu() (menu.Menu, error) {
 	menus, err := b.GetMenus()
 	if err != nil {
-		return lunch.Menu{}, err
+		return menu.Menu{}, err
 	}
 
-	menu, isPresent := menus[getKeyFromTime(b.timestamp)]
+	m, isPresent := menus[getKeyFromTime(b.timestamp)]
 	if !isPresent {
-		return lunch.Menu{}, fmt.Errorf("couldn't find lunch for date: %s", b.timestamp)
+		log.Printf("Couldn't find menu for date: %s", b.timestamp)
+		m = menu.Menu{}
 	}
 
-	return menu, nil
+	return m, nil
 }
 
 func getKeyFromTime(time time.Time) string {
 	return fmt.Sprintf("%02d%02d%02d", time.Year(), time.Month(), time.Day())
 }
 
-func (b *Braathen) GetMenus() (map[string]lunch.Menu, error) {
-	log.Printf("Getting lunch menu from %s", b.sourceUrl)
+func (b *Braathen) GetMenus() (map[string]menu.Menu, error) {
+	log.Printf("Getting menu from %s", b.sourceUrl)
 	resp, err := http.Get(b.sourceUrl)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	defer resp.Body.Close()
@@ -69,10 +70,10 @@ func (b *Braathen) GetMenus() (map[string]lunch.Menu, error) {
 	text := getContentTextFromNode(node)
 	splitSlice := splitSlice(text, "DAGENS MENY")
 
-	menus := make(map[string]lunch.Menu)
+	menus := make(map[string]menu.Menu)
 	for _, slice := range splitSlice {
-		menu := lunch.Menu{}
-		menu.Timestamp, err = getTimestampFromString(slice[0])
+		m := menu.Menu{}
+		m.Timestamp, err = getTimestampFromString(slice[0])
 		if err != nil {
 			return nil, err
 		}
@@ -80,14 +81,14 @@ func (b *Braathen) GetMenus() (map[string]lunch.Menu, error) {
 			for _, s := range strings.Split(line, "|") {
 				str := strings.Trim(s, " ")
 				if str != "" && str != " " {
-					menu.LunchItems = append(menu.LunchItems, str)
+					m.MenuItems = append(m.MenuItems, str)
 				}
 			}
 		}
-		if val, isPresent := menus[getKeyFromTime(menu.Timestamp)]; isPresent {
-			log.Printf("Found duplicate key: %s, existing value: %s replaced with new value %s", getKeyFromTime(menu.Timestamp), val, menu)
+		if val, isPresent := menus[getKeyFromTime(m.Timestamp)]; isPresent {
+			log.Printf("Found duplicate key: %s, existing value: %s replaced with new value %s", getKeyFromTime(m.Timestamp), val, m)
 		}
-		menus[getKeyFromTime(menu.Timestamp)] = menu
+		menus[getKeyFromTime(m.Timestamp)] = m
 	}
 	return menus, nil
 }
