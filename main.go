@@ -10,23 +10,24 @@ import (
 )
 
 const (
-	MenuUrl = "MENU_URL"
-	HookUrl = "HOOK_URL"
+	MenuURL = "MENU_URL"
+	HookURL = "HOOK_URL"
 )
 
 func Handler() error {
 	log.Println("lunchLambda invoked")
 
-	menuUrl := os.Getenv(MenuUrl)
+	menuURL := os.Getenv(MenuURL)
+	hookURL := os.Getenv(HookURL)
 
-	menu, err := menusources.NewBraathen(menuUrl, time.Now()).GetMenu()
+	menu, err := menusources.NewBraathen(menuURL, time.Now()).GetMenu()
 	if err != nil {
 		log.Printf("received error from menusource: %s", err)
 		return err
 	}
 
 	if !menu.IsEmpty() {
-		if err := menusinks.NewSlack(HookUrl).SendMenu(menu); err != nil {
+		if err := menusinks.NewSlack(hookURL).SendMenu(menu); err != nil {
 			log.Printf("received error from menusink: %s", err)
 			return err
 		}

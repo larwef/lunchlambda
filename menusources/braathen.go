@@ -17,12 +17,12 @@ const (
 )
 
 type Braathen struct {
-	sourceUrl string
+	sourceURL string
 	timestamp time.Time
 }
 
 func NewBraathen(url string, timestamp time.Time) *Braathen {
-	return &Braathen{sourceUrl: url, timestamp: timestamp}
+	return &Braathen{sourceURL: url, timestamp: timestamp}
 }
 
 func (b *Braathen) GetMenu() (menu.Menu, error) {
@@ -45,8 +45,8 @@ func getKeyFromTime(time time.Time) string {
 }
 
 func (b *Braathen) GetMenus() (map[string]menu.Menu, error) {
-	log.Printf("Getting menu from %s", b.sourceUrl)
-	resp, err := http.Get(b.sourceUrl)
+	log.Printf("Getting menu from %s", b.sourceURL)
+	resp, err := http.Get(b.sourceURL)
 	if err != nil {
 		return nil, err
 	}

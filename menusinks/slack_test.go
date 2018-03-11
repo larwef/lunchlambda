@@ -15,10 +15,13 @@ func TestSlack_SendMenu(t *testing.T) {
 
 	defer teardown()
 
+	handlerAssert := testutil.NewHandlerAssert(t, "/")
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		testutil.AssertEqual(t, r.Method, http.MethodPost)
 		bytes, _ := ioutil.ReadAll(r.Body)
 		testutil.AssertJSONSEqual(t, string(bytes), testutil.GetTestFileAsString(t, "../testdata/slackRequest.json"))
 		fmt.Fprint(w, "ok")
+		handlerAssert.Called()
 	})
 
 	menuItems := []string{"Some vegetarian alternative", "Some main dish", "Some soup"}
@@ -30,6 +33,7 @@ func TestSlack_SendMenu(t *testing.T) {
 	}
 
 	err := NewSlack(url).SendMenu(m)
+	handlerAssert.IsCalled()
 	testutil.AssertNotError(t, err)
 }
 
@@ -38,8 +42,10 @@ func TestSlack_SendMenu_404(t *testing.T) {
 
 	defer teardown()
 
+	handlerAssert := testutil.NewHandlerAssert(t, "/")
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(404)
+		handlerAssert.Called()
 	})
 
 	menuItems := []string{"Some vegetarian alternative", "Some main dish", "Some soup"}
@@ -51,11 +57,12 @@ func TestSlack_SendMenu_404(t *testing.T) {
 	}
 
 	err := NewSlack(url).SendMenu(m)
+	handlerAssert.IsCalled()
 	testutil.AssertEqual(t, err.Error(), "received response: \"404 Not Found\" on POST")
 }
 
 func TestSlack_SendMenu_EmptyMenu(t *testing.T) {
 	m := menu.Menu{}
 	err := NewSlack("").SendMenu(m)
-	testutil.AssertEqual(t, err.Error(), EmptyMenuError.Error())
+	testutil.AssertEqual(t, err.Error(), ErrEmptyMenu.Error())
 }

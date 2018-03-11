@@ -10,6 +10,26 @@ import (
 	"testing"
 )
 
+type HandlerAssert struct {
+	t        *testing.T
+	isCalled bool
+	handler  string
+}
+
+func NewHandlerAssert(t *testing.T, handler string) *HandlerAssert {
+	return &HandlerAssert{t: t, handler: handler}
+}
+
+func (h *HandlerAssert) IsCalled() {
+	if !h.isCalled {
+		h.t.Fatalf("Handler %s not called", h.handler)
+	}
+}
+
+func (h *HandlerAssert) Called() {
+	h.isCalled = true
+}
+
 func Setup() (mux *http.ServeMux, url string, teardown func()) {
 	mux = http.NewServeMux()
 	handler := http.NewServeMux()

@@ -10,11 +10,11 @@ import (
 	"net/http"
 )
 
-var EmptyMenuError = errors.New("empty menu")
+var ErrEmptyMenu = errors.New("empty menu")
 
 type (
 	Slack struct {
-		sinkUrl string
+		sinkURL string
 	}
 
 	data struct {
@@ -23,15 +23,15 @@ type (
 )
 
 func NewSlack(url string) *Slack {
-	return &Slack{sinkUrl: url}
+	return &Slack{sinkURL: url}
 }
 
 func (s *Slack) SendMenu(menu menu.Menu) error {
 	if len(menu.MenuItems) < 1 {
-		return EmptyMenuError
+		return ErrEmptyMenu
 	}
 
-	log.Printf("sending menu to: %s\n", s.sinkUrl)
+	log.Printf("sending menu to: %s\n", s.sinkURL)
 
 	d := data{Text: menu.ToString()}
 
@@ -40,7 +40,7 @@ func (s *Slack) SendMenu(menu menu.Menu) error {
 		return err
 	}
 
-	resp, err := http.Post(s.sinkUrl, "application/json", bytes.NewBuffer(payload))
+	resp, err := http.Post(s.sinkURL, "application/json", bytes.NewBuffer(payload))
 	if err != nil {
 		return err
 	}
