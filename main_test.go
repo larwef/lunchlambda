@@ -1,4 +1,4 @@
-package lunchlambda
+package main
 
 import (
 	"fmt"

@@ -1,4 +1,4 @@
-TARGET=target/lunchlambda
+TARGET=target
 
 all: test build
 
@@ -7,11 +7,11 @@ test:
 	go test ./... -v
 
 build:
-	GOOS=linux go build -o $(TARGET)
-	zip $(TARGET).zip $(TARGET)
+	GOOS=linux go build -o $(TARGET)/main
+	zip -j $(TARGET)/deployment.zip $(TARGET)/main
 
 clean:
-	rm -f $(TARGET) $(TARGET).zip
+	rm -rf $(TARGET)
 
 rebuild:
 	clean all
