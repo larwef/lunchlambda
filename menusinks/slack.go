@@ -31,7 +31,7 @@ func (s *Slack) SendMenu(menu menu.Menu) error {
 		return ErrEmptyMenu
 	}
 
-	log.Printf("sending menu to: %s\n", s.sinkURL)
+	log.Printf("Sending menu to: %s\n", s.sinkURL)
 
 	d := data{Text: menu.ToString()}
 

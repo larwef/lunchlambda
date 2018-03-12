@@ -27,6 +27,7 @@ func TestBraathen_GetMenu(t *testing.T) {
 	expected := menu.Menu{
 		Timestamp: time.Date(2018, time.March, 8, 0, 0, 0, 0, loc),
 		MenuItems: []string{"Fiskegrateng med pepperrotsmør", "Asiatisk marinert sopp", "Potetgrateng med spicy salat", "Gulrotsuppe med ingefær"},
+		Source:    url,
 	}
 
 	testutil.AssertEqual(t, reflect.DeepEqual(m, expected), true)
@@ -52,22 +53,27 @@ func TestBraathen_GetMenus(t *testing.T) {
 	expected["20180305"] = menu.Menu{
 		Timestamp: time.Date(2018, time.March, 5, 0, 0, 0, 0, loc),
 		MenuItems: []string{"Fersk pasta med mornaysaus", "Potetsalat", "Fersk pasta med vegetar mornaysaus", "Grønnsakssuppe"},
+		Source:    url,
 	}
 	expected["20180306"] = menu.Menu{
 		Timestamp: time.Date(2018, time.March, 6, 0, 0, 0, 0, loc),
 		MenuItems: []string{"Fiskekaker med mandelpotet og skalldyrsaus", "Råkostsalat med urtevinaigrette", "Bakt brokkoli med bulgur", "Kyllingsuppe"},
+		Source:    url,
 	}
 	expected["20180307"] = menu.Menu{
 		Timestamp: time.Date(2018, time.March, 7, 0, 0, 0, 0, loc),
 		MenuItems: []string{"Lasagne al forno", "Tomat- og rødløksalat med balsamico", "Falafel med stekte grønnsaker og tahinidressing", "Kremet fiskesuppe"},
+		Source:    url,
 	}
 	expected["20180308"] = menu.Menu{
 		Timestamp: time.Date(2018, time.March, 8, 0, 0, 0, 0, loc),
 		MenuItems: []string{"Fiskegrateng med pepperrotsmør", "Asiatisk marinert sopp", "Potetgrateng med spicy salat", "Gulrotsuppe med ingefær"},
+		Source:    url,
 	}
 	expected["20180309"] = menu.Menu{
 		Timestamp: time.Date(2018, time.March, 9, 0, 0, 0, 0, loc),
 		MenuItems: []string{"Røkt svinenakke med rødvinssaus og baconfrest sopp", "Nicoisesalat", "Vegetar Jambalaya", "Fisk Bisque"},
+		Source:    url,
 	}
 
 	for key, value := range menus {

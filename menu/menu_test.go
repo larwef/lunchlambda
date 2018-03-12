@@ -13,9 +13,10 @@ func TestMenu_ToString(t *testing.T) {
 	menu := Menu{
 		Timestamp: timeStamp,
 		MenuItems: menuItems,
+		Source:    "someSource",
 	}
 
-	expected := "Menu 07.03.2018\n- Some vegetarian alternative\n- Some main dish\n- Some soup\nNB: Menu may vary from what's presented"
+	expected := "Menu 07.03.2018\n- Some vegetarian alternative\n- Some main dish\n- Some soup\nSource: someSource\nNB: Menu may vary from what's presented"
 	testutil.AssertEqual(t, menu.ToString(), expected)
 }
 

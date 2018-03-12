@@ -9,6 +9,11 @@ import (
 type Menu struct {
 	Timestamp time.Time
 	MenuItems []string
+	Source    string
+}
+
+type Runner struct {
+	sinks []Getter
 }
 
 type Getter interface {
@@ -34,6 +39,7 @@ func (m *Menu) ToString() string {
 	for _, item := range m.MenuItems {
 		buffer.WriteString("- " + item + "\n")
 	}
+	buffer.WriteString(fmt.Sprintf("Source: %s\n", m.Source))
 	buffer.WriteString("NB: Menu may vary from what's presented")
 
 	return buffer.String()

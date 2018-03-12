@@ -30,6 +30,7 @@ func TestSlack_SendMenu(t *testing.T) {
 	m := menu.Menu{
 		Timestamp: timeStamp,
 		MenuItems: menuItems,
+		Source:    "source.com",
 	}
 
 	err := NewSlack(url).SendMenu(m)
@@ -54,6 +55,7 @@ func TestSlack_SendMenu_404(t *testing.T) {
 	m := menu.Menu{
 		Timestamp: timeStamp,
 		MenuItems: menuItems,
+		Source:    "source.com",
 	}
 
 	err := NewSlack(url).SendMenu(m)

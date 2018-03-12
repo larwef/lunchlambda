@@ -74,6 +74,7 @@ func (b *Braathen) GetMenus() (map[string]menu.Menu, error) {
 	for _, slice := range splitSlice {
 		m := menu.Menu{}
 		m.Timestamp, err = getTimestampFromString(slice[0])
+		m.Source = b.sourceURL
 		if err != nil {
 			return nil, err
 		}
