@@ -1,11 +1,10 @@
-package menusinks
+package menu
 
 import (
 	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/larwef/lunchlambda/menu"
 	"log"
 	"net/http"
 )
@@ -26,7 +25,7 @@ func NewSlack(url string) *Slack {
 	return &Slack{sinkURL: url}
 }
 
-func (s *Slack) SendMenu(menu menu.Menu) error {
+func (s *Slack) SendMenu(menu Menu) error {
 	if len(menu.MenuItems) < 1 {
 		return ErrEmptyMenu
 	}

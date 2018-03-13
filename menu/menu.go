@@ -3,6 +3,7 @@ package menu
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"time"
 )
 
@@ -12,8 +13,9 @@ type Menu struct {
 	Source    string
 }
 
-type Runner struct {
-	sinks []Getter
+type runner struct {
+	getter  Getter
+	senders []Sender
 }
 
 type Getter interface {
@@ -43,4 +45,37 @@ func (m *Menu) ToString() string {
 	buffer.WriteString("NB: Menu may vary from what's presented")
 
 	return buffer.String()
+}
+func NewRunner(getter Getter) *runner {
+	return &runner{getter: getter}
+}
+
+func (r *runner) AddSender(sender Sender) *runner {
+	r.senders = append(r.senders, sender)
+	return r
+}
+
+func (r *runner) Run() error {
+	if len(r.senders) < 1 {
+		log.Println("No senders registerd for runner")
+	}
+
+	menu, err := r.getter.GetMenu()
+
+	if err != nil {
+		log.Printf("received error from menusource: %s", err)
+		return err
+	}
+
+	if menu.IsEmpty() {
+		return ErrEmptyMenu
+	}
+
+	for _, element := range r.senders {
+		if err := element.SendMenu(menu); err != nil {
+			log.Printf("Encountered error when sending menu: %v", err)
+		}
+	}
+
+	return nil
 }

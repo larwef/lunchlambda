@@ -1,7 +1,9 @@
 package menu
 
 import (
+	"fmt"
 	"github.com/larwef/lunchlambda/testutil"
+	"net/http"
 	"testing"
 	"time"
 )
@@ -23,4 +25,49 @@ func TestMenu_ToString(t *testing.T) {
 func TestMenu_ToString_EmptyMenu(t *testing.T) {
 	menu := Menu{}
 	testutil.AssertEqual(t, menu.ToString(), "")
+}
+
+func TestRunner(t *testing.T) {
+	mux, url, teardown := testutil.Setup()
+
+	defer teardown()
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, testutil.GetTestFileAsString(t, "../testdata/pageSource.html"))
+	})
+
+	slack1HandlerAssert := testutil.NewHandlerAssert(t, "slack1")
+	mux.HandleFunc("/slack1", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "ok")
+		slack1HandlerAssert.Called()
+	})
+
+	slack2HandlerAssert := testutil.NewHandlerAssert(t, "slack2")
+	mux.HandleFunc("/slack2", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "ok")
+		slack2HandlerAssert.Called()
+	})
+
+	slack3HandlerAssert := testutil.NewHandlerAssert(t, "slack3")
+	mux.HandleFunc("/slack3", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "ok")
+		slack3HandlerAssert.Called()
+	})
+
+	loc, err := time.LoadLocation("Europe/Oslo")
+	testutil.AssertNotError(t, err)
+	braathens := NewBraathen(url, time.Date(2018, time.March, 8, 0, 0, 0, 0, loc))
+	testutil.AssertNotError(t, err)
+
+	slack1 := NewSlack(url + "/slack1")
+	slack2 := NewSlack(url + "/slack2")
+	slack3 := NewSlack(url + "/slack3")
+
+	runner := NewRunner(braathens).AddSender(slack1).AddSender(slack2).AddSender(slack3)
+
+	runner.Run()
+
+	slack1HandlerAssert.IsCalled()
+	slack2HandlerAssert.IsCalled()
+	slack2HandlerAssert.IsCalled()
 }

@@ -4,7 +4,7 @@ all: test build
 
 test:
 	go fmt ./...
-	go test ./... -v
+	go test ./...
 
 build:
 	GOOS=linux go build -o $(TARGET)/main

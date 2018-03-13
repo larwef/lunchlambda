@@ -1,8 +1,7 @@
-package menusinks
+package menu
 
 import (
 	"fmt"
-	"github.com/larwef/lunchlambda/menu"
 	"github.com/larwef/lunchlambda/testutil"
 	"io/ioutil"
 	"net/http"
@@ -27,7 +26,7 @@ func TestSlack_SendMenu(t *testing.T) {
 	menuItems := []string{"Some vegetarian alternative", "Some main dish", "Some soup"}
 	timeStamp, _ := time.Parse(time.RFC3339, "2018-03-07T16:30:03Z")
 
-	m := menu.Menu{
+	m := Menu{
 		Timestamp: timeStamp,
 		MenuItems: menuItems,
 		Source:    "source.com",
@@ -52,7 +51,7 @@ func TestSlack_SendMenu_404(t *testing.T) {
 	menuItems := []string{"Some vegetarian alternative", "Some main dish", "Some soup"}
 	timeStamp, _ := time.Parse(time.RFC3339, "2018-03-07T16:30:03Z")
 
-	m := menu.Menu{
+	m := Menu{
 		Timestamp: timeStamp,
 		MenuItems: menuItems,
 		Source:    "source.com",
@@ -64,7 +63,7 @@ func TestSlack_SendMenu_404(t *testing.T) {
 }
 
 func TestSlack_SendMenu_EmptyMenu(t *testing.T) {
-	m := menu.Menu{}
+	m := Menu{}
 	err := NewSlack("").SendMenu(m)
 	testutil.AssertEqual(t, err.Error(), ErrEmptyMenu.Error())
 }

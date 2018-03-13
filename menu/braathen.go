@@ -1,8 +1,7 @@
-package menusources
+package menu
 
 import (
 	"fmt"
-	"github.com/larwef/lunchlambda/menu"
 	"golang.org/x/net/html"
 	"log"
 	"net/http"
@@ -25,16 +24,16 @@ func NewBraathen(url string, timestamp time.Time) *Braathen {
 	return &Braathen{sourceURL: url, timestamp: timestamp}
 }
 
-func (b *Braathen) GetMenu() (menu.Menu, error) {
+func (b *Braathen) GetMenu() (Menu, error) {
 	menus, err := b.GetMenus()
 	if err != nil {
-		return menu.Menu{}, err
+		return Menu{}, err
 	}
 
 	m, isPresent := menus[getKeyFromTime(b.timestamp)]
 	if !isPresent {
 		log.Printf("Couldn't find menu for date: %s", b.timestamp)
-		m = menu.Menu{}
+		m = Menu{}
 	}
 
 	return m, nil
@@ -44,8 +43,8 @@ func getKeyFromTime(time time.Time) string {
 	return fmt.Sprintf("%02d%02d%02d", time.Year(), time.Month(), time.Day())
 }
 
-func (b *Braathen) GetMenus() (map[string]menu.Menu, error) {
-	log.Printf("Getting menu from %s", b.sourceURL)
+func (b *Braathen) GetMenus() (map[string]Menu, error) {
+	log.Printf("Getting menu from: %s", b.sourceURL)
 	resp, err := http.Get(b.sourceURL)
 	if err != nil {
 		return nil, err
@@ -70,9 +69,9 @@ func (b *Braathen) GetMenus() (map[string]menu.Menu, error) {
 	text := getContentTextFromNode(node)
 	splitSlice := splitSlice(text, "DAGENS MENY")
 
-	menus := make(map[string]menu.Menu)
+	menus := make(map[string]Menu)
 	for _, slice := range splitSlice {
-		m := menu.Menu{}
+		m := Menu{}
 		m.Timestamp, err = getTimestampFromString(slice[0])
 		m.Source = b.sourceURL
 		if err != nil {

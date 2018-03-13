@@ -20,7 +20,7 @@ func TestHandler_NoMenus(t *testing.T) {
 
 	err := Handler()
 	menuHandlerAssert.IsCalled()
-	testutil.AssertNotError(t, err)
+	testutil.AssertEqual(t, err.Error(), "empty menu")
 }
 
 func TestHandler_Menu404(t *testing.T) {
