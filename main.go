@@ -2,7 +2,9 @@ package main
 
 import (
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/larwef/lunchlambda/getters"
 	"github.com/larwef/lunchlambda/menu"
+	"github.com/larwef/lunchlambda/senders"
 	"log"
 	"os"
 	"time"
@@ -20,10 +22,10 @@ func Handler() error {
 	hookURL := os.Getenv(HookURL)
 
 	// Sources
-	braathen := menu.NewBraathen(menuURL, time.Now())
+	braathen := getters.NewBraathen(menuURL, time.Now())
 
 	// Sinks
-	slack := menu.NewSlack(hookURL)
+	slack := senders.NewSlack(hookURL)
 
 	// Run
 	err := menu.NewRunner(braathen).AddSender(slack).Run()

@@ -1,7 +1,8 @@
-package main
+package main_test
 
 import (
 	"fmt"
+	. "github.com/larwef/lunchlambda"
 	"github.com/larwef/lunchlambda/testutil"
 	"net/http"
 	"testing"

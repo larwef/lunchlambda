@@ -2,10 +2,13 @@ package menu
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"log"
 	"time"
 )
+
+var ErrEmptyMenu = errors.New("empty menu")
 
 type Menu struct {
 	Timestamp time.Time

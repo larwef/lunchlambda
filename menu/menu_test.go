@@ -1,7 +1,10 @@
-package menu
+package menu_test
 
 import (
 	"fmt"
+	"github.com/larwef/lunchlambda/getters"
+	. "github.com/larwef/lunchlambda/menu"
+	"github.com/larwef/lunchlambda/senders"
 	"github.com/larwef/lunchlambda/testutil"
 	"net/http"
 	"testing"
@@ -56,12 +59,12 @@ func TestRunner(t *testing.T) {
 
 	loc, err := time.LoadLocation("Europe/Oslo")
 	testutil.AssertNotError(t, err)
-	braathens := NewBraathen(url, time.Date(2018, time.March, 8, 0, 0, 0, 0, loc))
+	braathens := getters.NewBraathen(url, time.Date(2018, time.March, 8, 0, 0, 0, 0, loc))
 	testutil.AssertNotError(t, err)
 
-	slack1 := NewSlack(url + "/slack1")
-	slack2 := NewSlack(url + "/slack2")
-	slack3 := NewSlack(url + "/slack3")
+	slack1 := senders.NewSlack(url + "/slack1")
+	slack2 := senders.NewSlack(url + "/slack2")
+	slack3 := senders.NewSlack(url + "/slack3")
 
 	runner := NewRunner(braathens).AddSender(slack1).AddSender(slack2).AddSender(slack3)
 

@@ -1,15 +1,13 @@
-package menu
+package senders
 
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"github.com/larwef/lunchlambda/menu"
 	"log"
 	"net/http"
 )
-
-var ErrEmptyMenu = errors.New("empty menu")
 
 type (
 	Slack struct {
@@ -25,14 +23,14 @@ func NewSlack(url string) *Slack {
 	return &Slack{sinkURL: url}
 }
 
-func (s *Slack) SendMenu(menu Menu) error {
-	if len(menu.MenuItems) < 1 {
-		return ErrEmptyMenu
+func (s *Slack) SendMenu(m menu.Menu) error {
+	if len(m.MenuItems) < 1 {
+		return menu.ErrEmptyMenu
 	}
 
 	log.Printf("Sending menu to: %s\n", s.sinkURL)
 
-	d := data{Text: menu.ToString()}
+	d := data{Text: m.ToString()}
 
 	payload, err := json.Marshal(d)
 	if err != nil {
