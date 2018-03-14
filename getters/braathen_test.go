@@ -42,7 +42,7 @@ func TestBraathen_GetMenus(t *testing.T) {
 		fmt.Fprint(w, testutil.GetTestFileAsString(t, "../testdata/pageSource.html"))
 	})
 
-	menus, err := NewBraathen(url, time.Time{}).GetMenus()
+	menus, err := NewBraathen(url, time.Time{}).getMenus()
 	testutil.AssertNotError(t, err)
 	testutil.AssertEqual(t, len(menus), 5)
 

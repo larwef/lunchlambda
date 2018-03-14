@@ -10,11 +10,13 @@ import (
 	"time"
 )
 
+// Environment variable names
 const (
 	MenuURL = "MENU_URL"
 	HookURL = "HOOK_URL"
 )
 
+// Handler is the lambda handler function
 func Handler() error {
 	log.Println("lunchLambda invoked")
 

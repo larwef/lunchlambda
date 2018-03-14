@@ -8,31 +8,39 @@ import (
 	"time"
 )
 
+// ErrEmptyMenu is returned when Menu doesn't contain any MenuItems
 var ErrEmptyMenu = errors.New("empty menu")
 
+// Menu defines a menu for a given time from a given source.
 type Menu struct {
 	Timestamp time.Time
 	MenuItems []string
 	Source    string
 }
 
-type runner struct {
+// Runner object holds a getter to get a menu from some source and an array of senders which will send the menu to their
+// respective endpoints
+type Runner struct {
 	getter  Getter
 	senders []Sender
 }
 
+// Getter defines the behaviour of getting a menu from a source
 type Getter interface {
 	GetMenu() (Menu, error)
 }
 
+// Sender defines the behaviour of sending a menu to an endpoint
 type Sender interface {
 	SendMenu(menus Menu) error
 }
 
+// IsEmpty returns true if the Menu object contains no MenuItems
 func (m *Menu) IsEmpty() bool {
 	return len(m.MenuItems) < 1
 }
 
+// ToString returns a string representation of a Menu object
 func (m *Menu) ToString() string {
 	if len(m.MenuItems) < 1 {
 		return ""
@@ -49,16 +57,20 @@ func (m *Menu) ToString() string {
 
 	return buffer.String()
 }
-func NewRunner(getter Getter) *runner {
-	return &runner{getter: getter}
+
+// NewRunner is a constructor for the Runner object
+func NewRunner(getter Getter) *Runner {
+	return &Runner{getter: getter}
 }
 
-func (r *runner) AddSender(sender Sender) *runner {
+// AddSender adds an object implementing the Sender interface
+func (r *Runner) AddSender(sender Sender) *Runner {
 	r.senders = append(r.senders, sender)
 	return r
 }
 
-func (r *runner) Run() error {
+// Run executes the Getter and feeds the result to all the Senders
+func (r *Runner) Run() error {
 	if len(r.senders) < 1 {
 		log.Println("No senders registerd for runner")
 	}
@@ -79,6 +91,5 @@ func (r *runner) Run() error {
 			log.Printf("Encountered error when sending menu: %v", err)
 		}
 	}
-
 	return nil
 }

@@ -4,6 +4,7 @@ all: test build
 
 test:
 	go fmt ./...
+	golint ./...
 	go test ./...
 
 build:
@@ -15,3 +16,6 @@ clean:
 
 rebuild:
 	clean all
+
+doc:
+	godoc -http=":6060"

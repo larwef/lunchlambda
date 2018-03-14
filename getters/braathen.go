@@ -12,21 +12,25 @@ import (
 	"unicode"
 )
 
+// Constant defining the name of the html <div> containing menus
 const (
 	ContainerClass = "article-related-images slideshow"
 )
 
+// Braathen defines an object used to retrieve menus from Braathen Eiendoms web page
 type Braathen struct {
 	sourceURL string
 	timestamp time.Time
 }
 
+// NewBraathen is the constructor for Braathen object
 func NewBraathen(url string, timestamp time.Time) *Braathen {
 	return &Braathen{sourceURL: url, timestamp: timestamp}
 }
 
+// GetMenu gets menu for the date and from the source defined in the Braathens object
 func (b *Braathen) GetMenu() (menu.Menu, error) {
-	menus, err := b.GetMenus()
+	menus, err := b.getMenus()
 	if err != nil {
 		return menu.Menu{}, err
 	}
@@ -44,7 +48,7 @@ func getKeyFromTime(time time.Time) string {
 	return fmt.Sprintf("%02d%02d%02d", time.Year(), time.Month(), time.Day())
 }
 
-func (b *Braathen) GetMenus() (map[string]menu.Menu, error) {
+func (b *Braathen) getMenus() (map[string]menu.Menu, error) {
 	log.Printf("Getting menu from: %s", b.sourceURL)
 	resp, err := http.Get(b.sourceURL)
 	if err != nil {

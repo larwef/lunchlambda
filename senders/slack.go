@@ -10,6 +10,7 @@ import (
 )
 
 type (
+	// Slack is used to post a menu to Slack. Implements the Sender interface
 	Slack struct {
 		sinkURL string
 	}
@@ -19,10 +20,12 @@ type (
 	}
 )
 
+// NewSlack is a constructor for the Slack object
 func NewSlack(url string) *Slack {
 	return &Slack{sinkURL: url}
 }
 
+// SendMenu posts a menu to Slack
 func (s *Slack) SendMenu(m menu.Menu) error {
 	if len(m.MenuItems) < 1 {
 		return menu.ErrEmptyMenu
