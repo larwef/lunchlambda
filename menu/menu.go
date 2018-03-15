@@ -63,7 +63,7 @@ func NewRunner(getter Getter) *Runner {
 	return &Runner{getter: getter}
 }
 
-// AddSender adds an object implementing the Sender interface
+// AddSender adds an object implementing the Sender interface to the list of senders
 func (r *Runner) AddSender(sender Sender) *Runner {
 	r.senders = append(r.senders, sender)
 	return r

@@ -13,6 +13,11 @@ import (
 	"time"
 )
 
+const (
+	// AWSRegion defines region for AWS config
+	AWSRegion = "eu-west-1"
+)
+
 // Environment variable names
 const (
 	MenuURL  = "MENU_URL"
@@ -36,7 +41,7 @@ func Handler() error {
 	slack := senders.NewSlack(hookURL)
 	runner.AddSender(slack)
 
-	config := aws.Config{Region: aws.String("eu-west-1")}
+	config := aws.Config{Region: aws.String(AWSRegion)}
 
 	if newSession, err := session.NewSession(&config); err == nil {
 		newSns := senders.NewSns(snsTopic, "lunchLambda", sns.New(newSession))

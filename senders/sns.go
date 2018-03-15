@@ -31,9 +31,5 @@ func (s *SNSSender) SendMenu(m menu.Menu) error {
 	}
 
 	_, err := s.snsClient.Publish(&publishInput)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
