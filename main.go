@@ -38,11 +38,11 @@ func Handler() error {
 
 	config := aws.Config{Region: aws.String("eu-west-1")}
 
-	if newSession, err := session.NewSession(&config); err != nil {
+	if newSession, err := session.NewSession(&config); err == nil {
 		newSns := senders.NewSns(snsTopic, sns.New(newSession))
 		runner.AddSender(newSns)
 	} else {
-		log.Println("Error configuring SNS")
+		log.Printf("Error configuring SNS: %v", err)
 	}
 
 	// Run
