@@ -10,12 +10,13 @@ import (
 // SNSSender is used to send a menu to AWS SNS
 type SNSSender struct {
 	topicArn  string
+	subject   string
 	snsClient snsiface.SNSAPI
 }
 
 // NewSns is a constructor for the SNSSender object
-func NewSns(topicArn string, snsClient snsiface.SNSAPI) *SNSSender {
-	return &SNSSender{topicArn: topicArn, snsClient: snsClient}
+func NewSns(topicArn string, subject string, snsClient snsiface.SNSAPI) *SNSSender {
+	return &SNSSender{topicArn: topicArn, subject: subject, snsClient: snsClient}
 }
 
 // SendMenu sends a menu to SNS
@@ -25,6 +26,7 @@ func (s *SNSSender) SendMenu(m menu.Menu) error {
 
 	publishInput := sns.PublishInput{
 		Message:  &message,
+		Subject:  &s.subject,
 		TopicArn: &s.topicArn,
 	}
 
