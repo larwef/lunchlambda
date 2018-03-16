@@ -9,14 +9,25 @@ import (
 	"net/http"
 )
 
+const (
+	// BulletPoint is printet in front of all menu items
+	BulletPoint = ":knife_fork_plate:"
+)
+
 type (
 	// Slack is used to post a menu to Slack. Implements the Sender interface
 	Slack struct {
 		sinkURL string
 	}
 
-	data struct {
-		Text string `json:"text"`
+	message struct {
+		Attachments []attachment `json:"attachments"`
+	}
+
+	attachment struct {
+		Title  string `json:"title"`
+		Text   string `json:"text"`
+		Footer string `json:"footer"`
 	}
 )
 
@@ -33,9 +44,21 @@ func (s *Slack) SendMenu(m menu.Menu) error {
 
 	log.Printf("Sending menu to: %s\n", s.sinkURL)
 
-	d := data{Text: m.ToString()}
+	var buffer bytes.Buffer
+	for _, item := range m.MenuItems {
+		buffer.WriteString(BulletPoint + " " + item + "\n")
+	}
 
-	payload, err := json.Marshal(d)
+	a := attachment{
+		Title:  fmt.Sprintf("Menu %s %02d.%02d.%02d", m.Timestamp.Weekday(), m.Timestamp.Day(), m.Timestamp.Month(), m.Timestamp.Year()),
+		Text:   string(buffer.Bytes()[:buffer.Len()-1]),
+		Footer: "Source: " + m.Source + "\nNB: Menu may vary from what's presented",
+	}
+	mes := message{
+		Attachments: []attachment{a},
+	}
+
+	payload, err := json.Marshal(mes)
 	if err != nil {
 		return err
 	}

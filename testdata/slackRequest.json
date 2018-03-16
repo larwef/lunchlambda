@@ -1,3 +1,7 @@
 {
-  "text": "Menu 07.03.2018\n- Some vegetarian alternative\n- Some main dish\n- Some soup\nSource: source.com\nNB: Menu may vary from what's presented"
+  "attachments": [{
+    "title": "Menu Wednesday 07.03.2018",
+    "text": ":knife_fork_plate: Some vegetarian alternative\n:knife_fork_plate: Some main dish\n:knife_fork_plate: Some soup",
+    "footer": "Source: source.com\nNB: Menu may vary from what's presented"
+  }]
 }
