@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"sync"
 	"time"
 )
 
@@ -86,10 +87,17 @@ func (r *Runner) Run() error {
 		return ErrEmptyMenu
 	}
 
+	var waitGroup sync.WaitGroup
+	waitGroup.Add(len(r.senders))
 	for _, element := range r.senders {
-		if err := element.SendMenu(menu); err != nil {
-			log.Printf("Encountered error when sending menu: %v", err)
-		}
+		go func(sender Sender) {
+			if err := sender.SendMenu(menu); err != nil {
+				log.Printf("Encountered error when sending menu: %v", err)
+			}
+			waitGroup.Done()
+		}(element)
 	}
+
+	waitGroup.Wait()
 	return nil
 }
