@@ -17,18 +17,25 @@ type Menu struct {
 	Timestamp time.Time
 	MenuItems []string
 	Source    string
+	AudioURL  string
 }
 
 // Runner object holds a getter to get a menu from some source and an array of senders which will send the menu to their
 // respective endpoints
 type Runner struct {
-	getter  Getter
-	senders []Sender
+	getter    Getter
+	modifiers []Modifier
+	senders   []Sender
 }
 
 // Getter defines the behaviour of getting a menu from a source
 type Getter interface {
 	GetMenu() (Menu, error)
+}
+
+// Modifier defines an interface for modyfying menu object before sending it
+type Modifier interface {
+	Modify(menu *Menu) error
 }
 
 // Sender defines the behaviour of sending a menu to an endpoint
@@ -64,6 +71,12 @@ func NewRunner(getter Getter) *Runner {
 	return &Runner{getter: getter}
 }
 
+// AddModifier adds a modifier to the Runner obbject
+func (r *Runner) AddModifier(modifier Modifier) *Runner {
+	r.modifiers = append(r.modifiers, modifier)
+	return r
+}
+
 // AddSender adds an object implementing the Sender interface to the list of senders
 func (r *Runner) AddSender(sender Sender) *Runner {
 	r.senders = append(r.senders, sender)
@@ -85,6 +98,10 @@ func (r *Runner) Run() error {
 
 	if menu.IsEmpty() {
 		return ErrEmptyMenu
+	}
+
+	for _, modifier := range r.modifiers {
+		modifier.Modify(&menu)
 	}
 
 	var waitGroup sync.WaitGroup

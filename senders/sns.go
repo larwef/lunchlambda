@@ -1,6 +1,7 @@
 package senders
 
 import (
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/sns"
 	"github.com/aws/aws-sdk-go/service/sns/snsiface"
 	"github.com/larwef/lunchlambda/menu"
@@ -22,10 +23,9 @@ func NewSns(topicArn string, subject string, snsClient snsiface.SNSAPI) *SNSSend
 // SendMenu sends a menu to SNS
 func (s *SNSSender) SendMenu(m menu.Menu) error {
 	log.Printf("Publishing menu to SNS topic: %s", s.topicArn)
-	message := m.ToString()
 
 	publishInput := sns.PublishInput{
-		Message:  &message,
+		Message:  aws.String(m.ToString()),
 		Subject:  &s.subject,
 		TopicArn: &s.topicArn,
 	}

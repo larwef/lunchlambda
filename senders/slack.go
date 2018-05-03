@@ -49,10 +49,16 @@ func (s *Slack) SendMenu(m menu.Menu) error {
 		buffer.WriteString(BulletPoint + " " + item + "\n")
 	}
 
+	// Make prettier
+	var audioString string
+	if m.AudioURL != "" {
+		audioString = "\nAs mp3: " + m.AudioURL
+	}
+
 	a := attachment{
 		Title:  fmt.Sprintf("Menu %s %02d.%02d.%02d", m.Timestamp.Weekday(), m.Timestamp.Day(), m.Timestamp.Month(), m.Timestamp.Year()),
 		Text:   string(buffer.Bytes()[:buffer.Len()-1]),
-		Footer: "Source: " + m.Source + "\nNB: Menu may vary from what's presented",
+		Footer: "Source: " + m.Source + audioString + "\nNB: Menu may vary from what's presented",
 	}
 	mes := message{
 		Attachments: []attachment{a},
